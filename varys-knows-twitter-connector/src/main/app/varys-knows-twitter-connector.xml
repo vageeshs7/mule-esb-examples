@@ -11,9 +11,11 @@ http://www.mulesoft.org/schema/mule/twitter http://www.mulesoft.org/schema/mule/
     <twitter:config name="Twitter__Configuration" accessKey="133747625-TlYbk8INhc7kBFN52nCxRhRtq24UES1QkTGCg38m" accessSecret="wCb1lWfYFcYWPaq3WxWxIw45L4ZWB2JZI0KcVooBkwC04" consumerKey="YDi9K98wGORW7ktEadv3k70pU" consumerSecret="KBMOR3yKf729v8lUuEnsAsSqjidORiqf9LrAzzo89eJe7j1UeI" doc:name="Twitter: Configuration"/>
     <flow name="varys-knows-twitter-connectorFlow">
         <http:listener config-ref="HTTP_Listener_Configuration" path="gettweets" doc:name="HTTP"/>
-        <twitter:get-user-timeline-by-screen-name config-ref="Twitter__Configuration" screenName="#[message.inboundProperties.'http.query.params'.sname]" doc:name="Twitter"/>
+        <twitter:get-user-timeline-by-screen-name config-ref="Twitter__Configuration" screenName="#[message.inboundProperties.'http.query.params'.sname]" count="5" doc:name="Twitter"/>
         <foreach doc:name="For Each">
             <logger message="#[payload.text]" level="INFO" doc:name="Logger"/>
         </foreach>
+        <set-payload value="RT @#[message.payload[0].user.screenName] : #[message.payload[0].text]" mimeType="text/plain" doc:name="Set Payload"/>
+        <twitter:update-status config-ref="Twitter__Configuration" status="#[payload]" doc:name="Twitter"/>
     </flow>
 </mule>
