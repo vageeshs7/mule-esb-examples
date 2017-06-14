@@ -10,9 +10,21 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
     <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration"/>
     <expression-filter expression="#[message.inboundProperties.'http.request.uri' != '/favicon.ico']" name="Expression" doc:name="Expression"/>
     <sub-flow name="default_language">
-        <logger message="No language specified, defaulting to English" level="INFO" doc:name="Logger"/>
-        <set-variable variableName="language" value="English" doc:name="Variable - English"/>
-        <set-payload value="Hello!" doc:name="Set Payload - English"/>
+        <logger message="No language specified, selecting random language" level="INFO" doc:name="Logger"/>
+        <round-robin tracking:enable-default-events="true" doc:name="Round Robin">
+            <processor-chain>
+                <set-variable variableName="language" value="English" doc:name="Variable - English"/>
+                <set-payload value="Hello!" doc:name="Set Payload - English"/>
+            </processor-chain>
+            <processor-chain>
+                <set-variable variableName="language" value="Chinese" doc:name="Variable - Chinese"/>
+                <set-payload value="Ching chao chu!" doc:name="Set Payload - Chinese"/>
+            </processor-chain>
+            <processor-chain>
+                <set-variable variableName="language" value="Russian" doc:name="Variable - Russian"/>
+                <set-payload value="Rus!" doc:name="Set Payload - Russian"/>
+            </processor-chain>
+        </round-robin>
     </sub-flow>
     <flow name="varys-content-routerFlow">
         <http:listener config-ref="HTTP_Listener_Configuration" path="*" doc:name="HTTP"/>
